@@ -15,4 +15,4 @@ while True:
         write_service.write(path)
         write_service.close()
     except ValueError:
-        print("Number not present")
+        print("passing")
