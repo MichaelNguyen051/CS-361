@@ -1,6 +1,6 @@
 from time import sleep
 
-image_service = "image-service.txt"
+image_service = "image_service.txt"
 while True:
     sleep(1)
     read_service = open(image_service, "r")
