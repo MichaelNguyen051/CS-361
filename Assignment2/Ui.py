@@ -1,9 +1,11 @@
+import sys
 from time import sleep
 import cv2
 
 prng_service = "prng_service.txt"
 image_service = "image_service.txt"
-while True:
+running = True
+while running:
     response = input("Please type 1 to generate an image\nor 2 to exit:\n")
     if response == "1":
         write_service = open(prng_service, "w")
@@ -25,7 +27,7 @@ while True:
         cv2.destroyAllWindows()
         read_image.close()
     elif input == "2":
-        break
+        running = False
     else:
         print("unknown option")
 
