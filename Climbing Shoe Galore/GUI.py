@@ -1,4 +1,8 @@
 import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from brands import brands
+
 
 # Create the main window
 root = tk.Tk()
@@ -12,13 +16,20 @@ style_dropdown = None
 size_label = None
 size_dropdown = None
 back_button = None
+back_to_filter = None
 enter_button = None
+filtered_label = None
+listbox = None
 
 # Function to create the filter by brand view
 def filter_by_brand_view():
     # Destroy the old widgets
     button1.destroy()
     button2.destroy()
+    if back_to_filter:
+        back_to_filter.destroy()
+    if listbox:
+        listbox.destroy()
 
     # Create the new widgets
     global brand_label
@@ -76,6 +87,11 @@ def back_to_main_view():
     # Recreate the main widgets
     create_main_view()
 
+
+def back_to_filtered_view():
+    filter_by_brand_view()
+
+
 # Function to create the filtered view
 def create_filtered_view():
     # Destroy the old widgets
@@ -84,15 +100,28 @@ def create_filtered_view():
     style_label.destroy()
     style_dropdown.destroy()
     size_label.destroy()
-    size_dropdown.destroy()
     back_button.destroy()
+    size_dropdown.destroy()
     enter_button.destroy()
 
     # Create the new widgets
-    filtered_label = tk.Label(root, text="Filtered Results:")
-    filtered_label.pack()
+    items = ["item 1", "item 2", "item 3", "item 4", "item 5"]
 
-    # TODO: Add code to create the filtered results view
+    # create a Combobox widget and add the items to it
+    global listbox
+    listbox = tk.Listbox(root)
+    for item in items:
+        listbox.insert("end", item)
+    listbox.pack()
+    listbox.bind("<<ListboxSelect>>", on_select)
+
+    global back_to_filter
+    back_to_filter = tk.Button(root, text="Back", command=filter_by_brand_view)
+    back_to_filter.pack(side=tk.LEFT, padx=20, pady=10)
+    # global filtered_label
+    # filtered_label = tk.Label(root, text="Filtered Results:")
+    # filtered_label.pack(side=tk.CENTER)
+
 
 # Function to create the main view
 def create_main_view():
@@ -105,6 +134,17 @@ def create_main_view():
     global button2
     button2 = tk.Button(root, text="Search For Shoe", height=5, width=20)
     button2.pack(fill=tk.BOTH, expand=True, padx=20, pady=50)
+
+# function to handle the ListboxSelect event
+def on_select(event):
+    # get the index of the selected item
+    selection = event.widget.curselection()
+    if selection:
+        index = selection[0]
+        # get the selected item
+        item = event.widget.get(index)
+        # display a message box with the selected item
+        messagebox.showinfo("Selected Item", f"You clicked on {item}")
 
 create_main_view()
 
