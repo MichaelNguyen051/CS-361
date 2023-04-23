@@ -1,7 +1,13 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from brands import brands
+from FilterOptions.brands import brands
+from FilterOptions.climbing_type import climbing_type
+from FilterOptions.closure_type import closure_type
+from ShoeList.retrieve_shoe_names import retrieve_shoe_list
+from DetailedView.shoe_details import retrieve_details
+from DetailedView.downloadImage import download_shoe_image
+import textwrap
+from time import sleep
+from PIL import Image, ImageTk
 
 
 # Create the main window
@@ -11,85 +17,110 @@ root.geometry("300x600")
 # Create global variables for the filter by brand view
 brand_label = None
 brand_dropdown = None
-style_label = None
+climbing_style = None
 style_dropdown = None
-size_label = None
-size_dropdown = None
+closure_label = None
+closure_dropdown = None
 back_button = None
 back_to_filter = None
 enter_button = None
 filtered_label = None
 listbox = None
+brand = None
+scrollbar = None
+search_entry = None
+search_button = None
+
 
 # Function to create the filter by brand view
 def filter_by_brand_view():
     # Destroy the old widgets
-    button1.destroy()
-    button2.destroy()
+    filter_by_button.destroy()
+    keyword_search_button.destroy()
     if back_to_filter:
         back_to_filter.destroy()
     if listbox:
         listbox.destroy()
+        scrollbar.destroy()
 
     # Create the new widgets
     global brand_label
     brand_label = tk.Label(root, text="Brand:")
     brand_label.pack()
-    brand_options = ["Nike", "Adidas", "Puma", "Reebok"]
+    brand_options = brands
     brand_var = tk.StringVar(root)
     brand_var.set(brand_options[0])
     global brand_dropdown
     brand_dropdown = tk.OptionMenu(root, brand_var, *brand_options)
     brand_dropdown.pack()
 
-    global style_label
-    style_label = tk.Label(root, text="Style:")
-    style_label.pack()
-    style_options = ["Running", "Basketball", "Soccer", "Tennis"]
+    global climbing_style
+    climbing_style = tk.Label(root, text="Climbing Type (optional):")
+    climbing_style.pack()
+    style_options = climbing_type
     style_var = tk.StringVar(root)
     style_var.set(style_options[0])
     global style_dropdown
     style_dropdown = tk.OptionMenu(root, style_var, *style_options)
     style_dropdown.pack()
 
-    global size_label
-    size_label = tk.Label(root, text="Size:")
-    size_label.pack()
-    size_options = ["US 7", "US 8", "US 9", "US 10"]
-    size_var = tk.StringVar(root)
-    size_var.set(size_options[0])
-    global size_dropdown
-    size_dropdown = tk.OptionMenu(root, size_var, *size_options)
-    size_dropdown.pack()
+    global closure_label
+    closure_label = tk.Label(root, text="Closure System (optional):")
+    closure_label.pack()
+    closure_options = closure_type
+    closure_var = tk.StringVar(root)
+    closure_var.set(closure_options[0])
+    global closure_dropdown
+    closure_dropdown = tk.OptionMenu(root, closure_var, *closure_options)
+    closure_dropdown.pack()
 
     # Create the back button
-    global back_button
-    back_button = tk.Button(root, text="Back", command=back_to_main_view)
-    back_button.pack(side=tk.LEFT, padx=20, pady=10)
+    back_to_main_button()
 
     # Create the enter button
     global enter_button
-    enter_button = tk.Button(root, text="Enter", command=create_filtered_view)
+    enter_button = tk.Button(root, text="Enter", command=lambda: (get_filters(brand_var), create_filtered_view()))
     enter_button.pack(side=tk.RIGHT, padx=20, pady=10)
+
+
+def get_filters(brand_selection, type=None, closure=None):
+    global brand
+    brand = str(brand_selection.get())
+
 
 # Function to return to the main view
 def back_to_main_view():
     # Destroy the old widgets
-    brand_label.destroy()
-    brand_dropdown.destroy()
-    style_label.destroy()
-    style_dropdown.destroy()
-    size_label.destroy()
-    size_dropdown.destroy()
+    if brand_label:
+        brand_label.destroy()
+        brand_dropdown.destroy()
+        climbing_style.destroy()
+        style_dropdown.destroy()
+        closure_label.destroy()
+        closure_dropdown.destroy()
+        enter_button.destroy()
+    if search_button:
+        search_entry.destroy()
+        search_button.destroy()
     back_button.destroy()
-    enter_button.destroy()
 
     # Recreate the main widgets
     create_main_view()
 
 
-def back_to_filtered_view():
-    filter_by_brand_view()
+def create_search_view():
+    filter_by_button.destroy()
+    keyword_search_button.destroy()
+    global search_entry
+    search_entry = tk.Entry(root, width=30)
+    search_entry.pack(pady=10)
+
+    # Create a search button widget
+    global search_button
+    search_button = tk.Button(root, text="Search")
+    search_button.pack()
+
+    back_to_main_button()
 
 
 # Function to create the filtered view
@@ -97,54 +128,85 @@ def create_filtered_view():
     # Destroy the old widgets
     brand_label.destroy()
     brand_dropdown.destroy()
-    style_label.destroy()
+    climbing_style.destroy()
     style_dropdown.destroy()
-    size_label.destroy()
+    closure_label.destroy()
     back_button.destroy()
-    size_dropdown.destroy()
+    closure_dropdown.destroy()
     enter_button.destroy()
 
     # Create the new widgets
-    items = ["item 1", "item 2", "item 3", "item 4", "item 5"]
+    shoe_names = retrieve_shoe_list(brand)
 
     # create a Combobox widget and add the items to it
     global listbox
-    listbox = tk.Listbox(root)
-    for item in items:
-        listbox.insert("end", item)
+    listbox = tk.Listbox(root, width=45, height=20)
+    global scrollbar
+    scrollbar = tk.Scrollbar(root)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    listbox.config(yscrollcommand=scrollbar.set)
+    scrollbar.config(command=listbox.yview)
+    for name in shoe_names:
+        listbox.insert("end", name)
     listbox.pack()
     listbox.bind("<<ListboxSelect>>", on_select)
 
     global back_to_filter
     back_to_filter = tk.Button(root, text="Back", command=filter_by_brand_view)
     back_to_filter.pack(side=tk.LEFT, padx=20, pady=10)
-    # global filtered_label
-    # filtered_label = tk.Label(root, text="Filtered Results:")
-    # filtered_label.pack(side=tk.CENTER)
+
+    # back_to_main_button()
 
 
 # Function to create the main view
 def create_main_view():
     # Create button 1
-    global button1
-    button1 = tk.Button(root, text="Filter By Brand", height=5, width=20, command=filter_by_brand_view)
-    button1.pack(fill=tk.BOTH, expand=True, padx=20, pady=50)
+    global filter_by_button
+    filter_by_button = tk.Button(root, text="Filter By Brand", height=5, width=20, command=filter_by_brand_view)
+    filter_by_button.pack(fill=tk.BOTH, expand=True, padx=20, pady=50)
 
     # Create button 2
-    global button2
-    button2 = tk.Button(root, text="Search For Shoe", height=5, width=20)
-    button2.pack(fill=tk.BOTH, expand=True, padx=20, pady=50)
+    global keyword_search_button
+    keyword_search_button = tk.Button(root, text="Search For Shoe", height=5, width=20, command=create_search_view)
+    keyword_search_button.pack(fill=tk.BOTH, expand=True, padx=20, pady=50)
+
 
 # function to handle the ListboxSelect event
 def on_select(event):
     # get the index of the selected item
-    selection = event.widget.curselection()
-    if selection:
-        index = selection[0]
-        # get the selected item
-        item = event.widget.get(index)
-        # display a message box with the selected item
-        messagebox.showinfo("Selected Item", f"You clicked on {item}")
+    selected_item = [listbox.get(idx) for idx in listbox.curselection()]
+    shoe = selected_item[0]
+    show_image_window(shoe)
+
+
+def show_image_window(selection):
+    # create a new window
+    image_window = tk.Toplevel(root)
+    image_window.title(f"{selection}")
+    url = brand + " " + selection
+    # create a Label widget with the image
+    image = tk.Canvas(image_window, width=300, height=300)
+    image.grid(column=0, row=0)
+    # download_shoe_image(search=url)
+    img = ImageTk.PhotoImage(Image.open("shoe_photos/Test.JPEG").resize((50, 50)))
+    # my_image = tk.PhotoImage(file=f"shoe_photos/Test.JPEG")
+    l = tk.Label(image=img)
+    l.pack()
+    # image.create_image(100, 100, image=img)
+    try:
+        details = retrieve_details(shoe_url=url)
+    except AttributeError:
+        details = "No details on the shoe could be retrieved at this time."
+    wrapped_text = textwrap.fill(details, width=250)
+    text_label = tk.Label(image_window, text=wrapped_text, wraplength=250)
+    text_label.grid(column=0, row=1)
+
+
+def back_to_main_button():
+    global back_button
+    back_button = tk.Button(root, text="Back", command=back_to_main_view)
+    back_button.pack(side=tk.LEFT, padx=20, pady=10)
+
 
 create_main_view()
 
