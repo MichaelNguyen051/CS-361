@@ -23,7 +23,7 @@ def main():
     corr_id = str(uuid.uuid4())
 
     # Define the request message
-    message = "Hello, server!"
+    message = "Request for bird sighting"
 
     # Send the request message and wait for the response
     channel.basic_publish(exchange='',
