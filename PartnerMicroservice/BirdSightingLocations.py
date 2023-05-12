@@ -6,9 +6,9 @@ import os
 
 
 def main():
-    file_location = os.path.join(os.path.expanduser("~"), "Desktop")
+    # file_location = os.path.join(os.path.expanduser("~"), "Desktop")
     file_name = "Sightings.csv"
-    os.chdir(file_location)
+    # os.chdir(file_location)
     # Open the bird sightings file and read the lines
     with open(file_name, newline='') as csvfile:
         lines = list(csv.reader(csvfile))
