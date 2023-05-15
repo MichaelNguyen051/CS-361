@@ -2,7 +2,7 @@ import tkinter as tk
 from FilterOptions.brands import brands
 from FilterOptions.climbing_type import climbing_type
 from FilterOptions.closure_type import closure_type
-from ShoeList.retrieve_shoe_names import retrieve_shoe_list
+from ShoeList.retrieve_shoe_details import retrieve_shoe_list
 from DetailedView.shoe_details import retrieve_details
 from DetailedView.downloadImage import download_shoe_image
 import textwrap
