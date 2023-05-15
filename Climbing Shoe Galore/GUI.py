@@ -89,9 +89,14 @@ def get_filters(brand_selection, style_selection, closure_selection):
     global brand
     global style
     global closure
+    no_selection = "select"
     brand = str(brand_selection.get())
     style = str(style_selection.get())
     closure = str(closure_selection.get())
+    if style == no_selection:
+        style = None
+    if closure == no_selection:
+        closure = None
 
 
 # Function to return to the main view

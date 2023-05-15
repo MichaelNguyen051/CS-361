@@ -3,12 +3,15 @@ import pika
 import uuid
 
 
-def retrieve_shoe_list(brand, type=None, closure=None):
+def retrieve_shoe_list(brand, climbing_type=None, closure=None):
     shoe_list = None
     def on_message_received(ch, method, props, body):
         nonlocal shoe_list
-        shoe_list = json.loads(body)[brand]
-        print(f"Received response: {shoe_list}")
+        try:
+            shoe_list = json.loads(body)[brand]
+            print(f"Received response: {shoe_list}")
+        except:
+            shoe_list = {"No shoes match your filter selection"}
         connection.close()
 
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -23,11 +26,11 @@ def retrieve_shoe_list(brand, type=None, closure=None):
     cor_id = str(uuid.uuid4())
     print(f'Sending Request: {cor_id}')
 
-    example_body = {'brand': brand, 'closure': closure, 'type': type}
+    request_body = {'brand': brand, 'closure': closure, 'type': climbing_type}
 
     channel.basic_publish('', routing_key='request-queue',
                           properties=pika.BasicProperties(reply_to=reply_queue.method.queue, correlation_id=cor_id),
-                          body=json.dumps(example_body))
+                          body=json.dumps(request_body))
     print("Starting Client")
 
     channel.start_consuming()
