@@ -3,7 +3,6 @@ from FilterOptions.brands import brands
 from FilterOptions.climbing_type import climbing_type
 from FilterOptions.closure_type import closure_type
 from ShoeList.retrieve_shoe_details import retrieve_shoe_list
-from DetailedView.shoe_details import retrieve_details
 from DetailedView.downloadImage import download_shoe_image
 import textwrap
 from time import sleep
@@ -27,9 +26,12 @@ enter_button = None
 filtered_label = None
 listbox = None
 brand = None
+style = None
+closure = None
 scrollbar = None
 search_entry = None
 search_button = None
+shoes_retrieved = None
 
 
 # Function to create the filter by brand view
@@ -79,13 +81,17 @@ def filter_by_brand_view():
 
     # Create the enter button
     global enter_button
-    enter_button = tk.Button(root, text="Enter", command=lambda: (get_filters(brand_var), create_filtered_view()))
+    enter_button = tk.Button(root, text="Enter", command=lambda: (get_filters(brand_var, style_var, closure_var), create_filtered_view()))
     enter_button.pack(side=tk.RIGHT, padx=20, pady=10)
 
 
-def get_filters(brand_selection, type=None, closure=None):
+def get_filters(brand_selection, style_selection, closure_selection):
     global brand
+    global style
+    global closure
     brand = str(brand_selection.get())
+    style = str(style_selection.get())
+    closure = str(closure_selection.get())
 
 
 # Function to return to the main view
@@ -136,7 +142,8 @@ def create_filtered_view():
     enter_button.destroy()
 
     # Create the new widgets
-    shoe_names = retrieve_shoe_list(brand)
+    global shoes_retrieved
+    shoes_retrieved = retrieve_shoe_list(brand, style, closure)
 
     # create a Combobox widget and add the items to it
     global listbox
@@ -146,7 +153,7 @@ def create_filtered_view():
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     listbox.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=listbox.yview)
-    for name in shoe_names:
+    for name in shoes_retrieved:
         listbox.insert("end", name)
     listbox.pack()
     listbox.bind("<<ListboxSelect>>", on_select)
@@ -183,9 +190,10 @@ def show_image_window(selection):
     # create a new window
     image_window = tk.Toplevel(root)
     image_window.title(f"{selection}")
-    url = brand + " " + selection
+    global shoes_retrieved
+    selected_shoe_details = shoes_retrieved[selection]["Description"]
     # create a Label widget with the image
-    image = tk.Canvas(image_window, width=300, height=300)
+    image = tk.Canvas(image_window, width=350, height=300)
     image.grid(column=0, row=0)
     # download_shoe_image(search=url)
     img = ImageTk.PhotoImage(Image.open("shoe_photos/Test.JPEG").resize((50, 50)))
@@ -194,11 +202,11 @@ def show_image_window(selection):
     l.pack()
     # image.create_image(100, 100, image=img)
     try:
-        details = retrieve_details(shoe_url=url)
+        details = selected_shoe_details
     except AttributeError:
         details = "No details on the shoe could be retrieved at this time."
-    wrapped_text = textwrap.fill(details, width=250)
-    text_label = tk.Label(image_window, text=wrapped_text, wraplength=250)
+    wrapped_text = textwrap.fill(details, width=300)
+    text_label = tk.Label(image_window, text=wrapped_text, wraplength=300)
     text_label.grid(column=0, row=1)
 
 
