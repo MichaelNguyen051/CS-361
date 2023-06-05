@@ -4,10 +4,7 @@ from FilterOptions.climbing_type import climbing_type
 from FilterOptions.closure_type import closure_type
 from ShoeList.retrieve_shoe_details import retrieve_shoe_list
 import webbrowser
-from DetailedView.downloadImage import download_shoe_image
 import textwrap
-from time import sleep
-from PIL import Image, ImageTk
 
 # Create the main window
 root = tk.Tk()
