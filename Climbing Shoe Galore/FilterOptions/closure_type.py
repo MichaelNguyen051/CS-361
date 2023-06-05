@@ -1,1 +1,1 @@
-closure_type = ["select", "Hook-and-Loop", "Lace", "Slipper"]
+closure_type = ["select", "Lace", "Slipper", "Hook-and-Loop"]

@@ -19,7 +19,7 @@ def main():
             filtered_url = url + "?p=Brand%3A100000486"
         elif brand == "Butora":
             filtered_url = url + '?p=Brand%3A100005426'
-        elif brand == "Ocurn":
+        elif brand == "Ocun":
             filtered_url = url + '?p=Brand%3A100006562' 
         elif brand == "Black Diamond":
             filtered_url = url + '?p=Brand%3A14'  

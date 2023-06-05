@@ -1,1 +1,1 @@
-climbing_type = ["select", "Trad Climbing", "Sport Climbing", "Bouldering"]
+climbing_type = ["select", "Bouldering", "Sport Climbing", "Trad Climbing"]
